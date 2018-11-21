@@ -2,7 +2,7 @@ import { Provider } from 'mobx-react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import './index.scss';
+import './index.less';
 
 import AppRouter from './router/router';
 import AppStore from './store/app';
@@ -20,4 +20,3 @@ ReactDOM.render(
   document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();
-

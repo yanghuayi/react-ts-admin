@@ -1,0 +1,50 @@
+.dataTable {
+  min-height: e('calc(100vh - 182px)');
+  overflow: auto;
+  margin: 10px;
+}
+:global {
+  #dataTable{
+    transition: .4s all cubic-bezier(0.860, 0.15, 0.135, 0.785);
+    margin-top: 0;
+    background-color: #fff;
+  }
+}
+.link-blue {
+
+}
+.link-red {
+  color: #fa4059;
+}
+.link-green {
+  color: #52c41a;
+}
+.link-orange {
+  color: #faad14;
+}
+
+.tableLink {
+  a {
+    margin: 0 5px;
+    &.linkDisabled {
+      color: #acacac;
+      &:hover {
+        color: #acacac;
+        opacity: 1;
+        cursor: not-allowed;
+      }
+    }
+    &:hover {
+      opacity: 0.7;
+      &.link-red {
+        color: #fa4059;
+      }
+      &.link-green {
+        color: #52c41a;
+      }
+      &.link-orange {
+        color: #faad14;
+      }
+    }
+  }
+}

@@ -1,0 +1,95 @@
+.filterWrap {
+  position: relative;
+  padding: 0;
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+  .defaultForm {
+    background-color: #fff;
+    padding: 10px;
+    padding-top: 14px;
+    position: relative;
+    border-bottom: 1px solid #ececec;
+    transition: .4s all cubic-bezier(0.860, 0.15, 0.135, 0.785);
+    :global {
+      .ant-col-xs-12 {
+        padding: 0 5px !important;
+      }
+    }
+  }
+  :global {
+    .ant-form-item-children {
+      position: static;
+    }
+    .ant-calendar-picker {
+      width: 100% !important;
+    }
+  }
+  .gradeForm {
+    position: absolute;
+    width: 100%;
+    z-index: 99;
+    background-color: #fff;
+    top: -500%;
+    border-bottom: 1px solid #ececec;
+    transition: .4s all cubic-bezier(0.860, 0.15, 0.135, 0.785);
+    padding: 10px;
+    .gradeItem {
+      margin-bottom: 10px;
+    }
+    .gradeBtn {
+      padding-left: 14px;
+      margin-bottom: 0;
+      Button {
+        margin-right: 10px;
+      }
+    }
+    &.gradeShow {
+      top: 0px;
+    }
+  }
+}
+
+.filterBtn {
+  button {
+    margin-right: 10px;
+  }
+}
+.tableBtn {
+  position: absolute;
+  bottom: 13px;
+  right: 0px;
+  top: 0;
+  Button {
+    margin-left: 15px;
+    margin-right: 0px;
+  }
+}
+
+.itemForm {
+  width: 100%;
+  padding: 0 5px;
+  margin-bottom: 0;
+}
+
+.checkboxList {
+  label.ant-checkbox-group-item {
+    width: 50%;
+  }
+}
+@media screen and (max-width: 768px) {
+  .gradeBtn {
+    padding-left: 5px !important;
+  }
+  .filterBtn button {
+    display: inline-block;
+  }
+  .tableBtn {
+    position: relative;
+
+    Button {
+      margin-left: 0px;
+      margin-right: 10px;
+    }
+  }
+}

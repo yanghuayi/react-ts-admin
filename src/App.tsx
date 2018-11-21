@@ -1,7 +1,7 @@
 import { Rate } from 'antd';
 import * as React from 'react';
 
-import './App.scss';
+import './App.less';
 
 import logo from './logo.svg';
 class App extends React.Component {
