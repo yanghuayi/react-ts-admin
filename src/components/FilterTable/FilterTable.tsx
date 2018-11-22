@@ -1,6 +1,4 @@
 import React, { Component } from 'react'
-import { IFilterTable} from 'global';
-
 import styles from './filterTable.less'
 
 import Filter from './Filter'

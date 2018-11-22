@@ -1,28 +1,50 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Table, Message, Popconfirm } from 'antd'
-import { request } from 'utils'
+import { ColumnProps } from 'antd/lib/table';
+import { PaginationProps } from 'antd/lib/pagination';
+import { Table, message, Popconfirm } from 'antd'
 import DropOption from '../DropOption/DropOption'
 import styles from './MTable.less'
 
-class DataTable extends React.Component {
-  constructor(props) {
+interface IDataTableProps<T> {
+  otherList: any,
+  fetch: FetchData,
+  localName: string,
+  rowKey: string,
+  pagination: PaginationProps,
+  scroll: { x?: number, y?: number },
+  fetchError: (err: any) => void,
+  menuClick: (key: string, data: any) => void,
+  opreat: Operat[] | boolean,
+  columns: Array<ColumnProps<T>>,
+}
+
+interface IDataTableState {
+  loading: boolean,
+  dataSource: object[],
+  fetch: FetchData,
+  fetchData: { rows: number, page: number },
+  pagination: PaginationProps,
+}
+
+class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> {
+  constructor(props: IDataTableProps<T>) {
     super(props)
     let {
-      dataSource = [],
       fetch,
+    } = props
+    const {
       pagination = {
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: total => `共 ${total} 条`,
+        showTotal: (total: number) => `共 ${total} 条`,
         current: 1,
         total: 100,
       },
-    } = props
+    } = props;
     fetch = JSON.parse(JSON.stringify(fetch))
     this.state = {
       loading: false,
-      dataSource,
+      dataSource: [],
       fetch,
       fetchData: {
         rows: 10,
@@ -32,19 +54,19 @@ class DataTable extends React.Component {
     }
   }
 
-  componentDidMount() {
-    let hash = window.location.hash
+  public componentDidMount() {
+    const hash = window.location.hash
     if (this.props.fetch && hash.indexOf('?') < 0) {
       this.fetch('init')
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps: IDataTableProps<T>) {
     if (JSON.stringify(this.state.fetch.data) !== JSON.stringify(nextProps.fetch.data)) {
       this.setState({
         fetch: JSON.parse(JSON.stringify(nextProps.fetch)),
       }, () => {
-        let { fetchData } = this.state;
+        const { fetchData } = this.state;
         fetchData.page = 1;
         this.setState({
           fetchData,
@@ -55,9 +77,9 @@ class DataTable extends React.Component {
     }
   }
 
-  handleTableChange = (pagination, filters) => { // 第三个参数 sorter 排序
-    let pager = this.state.pagination
-    let { fetchData } = this.state
+  public handleTableChange = (pagination: PaginationProps, filters: any) => { // 第三个参数 sorter 排序
+    const pager = this.state.pagination
+    const { fetchData } = this.state
     if (pager.current !== pagination.current || fetchData.rows !== pagination.pageSize || fetchData.page !== pagination.current) {
       pager.current = pagination.current
       this.setState({
@@ -73,25 +95,25 @@ class DataTable extends React.Component {
     }
   }
 
-  fetch = (type) => {
+  protected fetch = (type: string) => {
     const { fetch: { url, data, dataKey } } = this.props
     const { fetchData } = this.state
     this.setState({ loading: true })
-    request({
+    window.API.request({
       url,
       method: 'POST',
       data: {
         ...data,
         ...fetchData,
       },
-    }).then((data) => {
+    }).then((data: any) => {
       const result = data.result
       const tableData = data.entity
       if (!this.refs.DataTable) {
         return
       }
       if (!result.resultCode) {
-        let { pagination } = this.state
+        const { pagination } = this.state
         if (typeof pagination !== 'boolean') {
           pagination.total = data.entity.totalRow
         }
@@ -101,19 +123,19 @@ class DataTable extends React.Component {
           pagination,
         })
       } else {
-        Message.error(result.resultMessage);
+        message.error(result.resultMessage);
         this.props.fetchError(data)
       }
-    }).catch((error) => {
+    }).catch((error: any) => {
       this.setState({ loading: false })
-      Message.error(error.message)
+      message.error(error.message)
       this.props.fetchError(error)
     })
   }
 
-  render() {
+  public render() {
     const self = this
-    let { fetch, rowKey, scroll, ...tableProps } = this.props
+    const { fetch, rowKey, scroll, opreat, ...tableProps } = this.props
     const { loading, dataSource, pagination } = this.state
     // if (!scroll) {
     //   scroll = {
@@ -122,21 +144,21 @@ class DataTable extends React.Component {
     // } else if (!scroll.y) {
     //   scroll.y = document.body.clientHeight - 240
     // }
-    if (this.props.opreat) {
+    if (opreat) {
       if (tableProps.columns[tableProps.columns.length - 1].title !== '操作') {
-        if (this.props.opreat.length < 5) {
+        if (typeof opreat === 'object' && opreat.length < 5) {
           tableProps.columns.push({
             title: '操作',
             dataIndex: 'action',
             key: 'action',
-            width: self.props.opreat.length * 60,
+            width: opreat.length * 60,
             render(text, record) {
-              let whiteList = ['red', 'orange']
+              const whiteList = ['red', 'orange']
               return <div className={styles.tableLink}>{
-                self.props.opreat.map((item) => {
+                opreat.map((item) => {
                   if (item.disabled && item.disabled(record)) {
                     return <a key={item.key} href="javascript:;" className={styles.linkDisabled}>{typeof item.name === 'function' ? item.name(record) : item.name}</a>
-                  } else if ((typeof item.color === 'function' && whiteList.indexOf(item.color(record)) >= 0) || whiteList.indexOf(item.color) >= 0) {
+                  } else if ((typeof item.color === 'function' && whiteList.indexOf(item.color(record)) >= 0) || whiteList.indexOf(typeof item.color === 'string' ? item.color : '') >= 0) {
                     return <Popconfirm title={typeof item.msg === 'function' ? item.msg(record) : item.msg} key={item.key} onConfirm={e => self.props.menuClick(item.key, record)} okText="确定" cancelText="取消">
                       <a href="javascript:;" className={styles[`link-${typeof item.color === 'function' ? item.color(record) : item.color}`]}>{typeof item.name === 'function' ? item.name(record) : item.name}</a>
                     </Popconfirm>
@@ -149,12 +171,13 @@ class DataTable extends React.Component {
             },
           })
         } else {
+          const OPreat = typeof opreat === 'object' ? opreat : [];
           tableProps.columns.push({
             title: '操作',
             dataIndex: 'action',
             key: 'action',
             render(text, record) {
-              return <DropOption onMenuClick={e => self.props.menuClick(e.key, record)} record={record} menuOptions={self.props.opreat} />
+              return <DropOption onMenuClick={e => self.props.menuClick(e.key, record)} record={record} menuOptions={OPreat} />
             },
           })
         }
@@ -164,7 +187,7 @@ class DataTable extends React.Component {
       ref="DataTable"
       size="middle"
       id="dataTable"
-      bordered
+      bordered={true}
       scroll={scroll}
       className={styles.dataTable}
       loading={loading}
@@ -175,27 +198,6 @@ class DataTable extends React.Component {
       dataSource={dataSource}
     />)
   }
-}
-
-
-DataTable.propTypes = {
-  fetch: PropTypes.object.isRequired,
-  rowKey: PropTypes.string.isRequired,
-  pagination: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.object,
-  ]),
-  columns: PropTypes.array.isRequired,
-  opreat: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.bool,
-  ]),
-  otherList: PropTypes.array,
-  menuClick: PropTypes.func,
-  localName: PropTypes.string.isRequired,
-  dataSource: PropTypes.array,
-  scroll: PropTypes.object,
-  fetchError: PropTypes.func.isRequired,
 }
 
 export default DataTable
