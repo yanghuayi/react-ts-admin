@@ -1,6 +1,6 @@
 import { Icon, Layout, Menu, Popover } from 'antd';
+import { ClickParam } from 'antd/lib/menu';
 import classnames from 'classnames';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Bread from './Bread';
@@ -9,10 +9,25 @@ import Menus from './Menu';
 
 const { SubMenu } = Menu
 
+interface IHeaderProps {
+  user: any,
+  logout: () => void,
+  switchSider: () => void,
+  siderFold: boolean,
+  isNavbar: boolean,
+  menuPopoverVisible: boolean,
+  location: Location,
+  switchMenuPopover: (visible: boolean) => void,
+  navOpenKeys: string[],
+  changeOpenKeys: (keys: string[]) => void,
+  menu: Menus[],
+  tabList: TabList[],
+}
+
 const Header = ({
-  user, logout, switchSider, siderFold, isNavbar, menuPopoverVisible, location, switchMenuPopover, navOpenKeys, changeOpenKeys, menu,
-}) => {
-  const handleClickMenu = e => e.key === 'logout' && logout()
+  user, logout, switchSider, siderFold, isNavbar, menuPopoverVisible, location, switchMenuPopover, navOpenKeys, changeOpenKeys, menu, tabList
+}: IHeaderProps) => {
+  const handleClickMenu = (e: ClickParam) => e.key === 'logout' && logout()
   const menusProps = {
     menu,
     siderFold: false,
@@ -22,6 +37,7 @@ const Header = ({
     location,
     navOpenKeys,
     changeOpenKeys,
+    tabList,
   }
   const breadProps = {
     menu,
@@ -64,20 +80,6 @@ const Header = ({
       </div>
     </Layout.Header>
   )
-}
-
-Header.propTypes = {
-  menu: PropTypes.array,
-  user: PropTypes.object,
-  logout: PropTypes.func,
-  switchSider: PropTypes.func,
-  siderFold: PropTypes.bool,
-  isNavbar: PropTypes.bool,
-  menuPopoverVisible: PropTypes.bool,
-  location: PropTypes.object,
-  switchMenuPopover: PropTypes.func,
-  navOpenKeys: PropTypes.array,
-  changeOpenKeys: PropTypes.func,
 }
 
 export default Header

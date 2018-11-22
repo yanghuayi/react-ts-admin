@@ -11,6 +11,9 @@
     "jsx-no-lambda": false,
     "object-literal-sort-keys": false,
     "forin": false,
-    "ordered-imports": false
+    "ordered-imports": false,
+    "variable-name": false,
+    "no-shadowed-variable": false,
+    "jsx-no-string-ref": false
   }
 }

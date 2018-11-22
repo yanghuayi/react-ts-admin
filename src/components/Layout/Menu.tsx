@@ -1,24 +1,33 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Menu, Icon } from 'antd'
+import { Menu } from 'antd'
 import { Link } from 'react-router-dom'
-import { arrayToTree, queryArray } from 'utils'
+import { arrayToTree, queryArray } from '@/utils'
 import pathToRegexp from 'path-to-regexp'
 
-const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, location, tabList }) => {
+interface IMenusProps {
+  siderFold: boolean,
+  darkTheme: boolean,
+  navOpenKeys: string[],
+  changeOpenKeys: (keys: string[]) => void,
+  menu: Menus[],
+  location: Location,
+  tabList: TabList[],
+}
+
+const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, location, tabList }: IMenusProps) => {
   // 生成树状
   // mpid过滤
-  let menuTree = arrayToTree(menu.filter(_ => _.mpid !== '-1'), 'id', 'mpid')
+  const menuTree = arrayToTree(menu.filter(_ => _.mpid !== '-1'), 'id', 'mpid')
   const levelMap = {}
-  let tabRoute = [];
-  let tabSearch = [];
+  const tabRoute: string[] = [];
+  const tabSearch: string[] = [];
   tabList.map((item) => {
     tabRoute.push(item.route)
     tabSearch.push(item.search)
   })
   // 递归生成菜单
-  const getMenus = (menuTreeN, siderFoldN) => {
-    return menuTreeN.map((item) => {
+  const getMenus = (menuTreeN: any, siderFoldN: boolean) => {
+    return menuTreeN.map((item: any) => {
       if (item.children) {
         if (item.mpid) {
           levelMap[item.id] = item.mpid
@@ -27,7 +36,7 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
           <Menu.SubMenu
             key={item.id}
             title={<span>
-              {item.icon && <i className={`iconfont menu-icon ${item.icon}`}></i>}
+              {item.icon && <i className={`iconfont menu-icon ${item.icon}`}/>}
               {(!siderFoldN || !menuTree.includes(item)) && item.name}
             </span>}
           >
@@ -38,7 +47,7 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
       return (
         <Menu.Item key={item.id}>
           <Link to={{pathname: item.route || '#', search: tabRoute.indexOf(item.route) > -1 ? tabSearch[tabRoute.indexOf(item.route)] : ''}}>
-            {item.icon && <i className={`iconfont menu-icon ${item.icon}`}></i>}
+            {item.icon && <i className={`iconfont menu-icon ${item.icon}`}/>}
             {(!siderFoldN || !menuTree.includes(item)) && item.name}
           </Link>
         </Menu.Item>
@@ -48,16 +57,16 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
   const menuItems = getMenus(menuTree, siderFold)
 
   // 保持选中
-  const getAncestorKeys = (key) => {
-    let map = {}
-    const getParent = (index) => {
+  const getAncestorKeys = (key: string) => {
+    const map = {}
+    const getParent = (index: string) => {
       const result = [String(levelMap[index])]
       if (levelMap[result[0]]) {
         result.unshift(getParent(result[0])[0])
       }
       return result
     }
-    for (let index in levelMap) {
+    for (const index in levelMap) {
       if ({}.hasOwnProperty.call(levelMap, index)) {
         map[index] = getParent(index)
       }
@@ -65,7 +74,7 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
     return map[key] || []
   }
 
-  const onOpenChange = (openKeys) => {
+  const onOpenChange = (openKeys: string[]) => {
     const latestOpenKey = openKeys.find(key => !navOpenKeys.includes(key))
     const latestCloseKey = navOpenKeys.find(key => !openKeys.includes(key))
     let nextOpenKeys = []
@@ -78,7 +87,7 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
     changeOpenKeys(nextOpenKeys)
   }
 
-  let menuProps = !siderFold ? {
+  const menuProps = !siderFold ? {
     onOpenChange,
     openKeys: navOpenKeys,
   } : {}
@@ -87,15 +96,15 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
   // 寻找选中路由
   let currentMenu
   let defaultSelectedKeys
-  for (let item of menu) {
+  for (const item of menu) {
     if (item.route && pathToRegexp(item.route).exec(location.pathname)) {
       currentMenu = item
       break
     }
   }
-  const getPathArray = (array, current, pid, id) => {
-    let result = [String(current[id])]
-    const getPath = (item) => {
+  const getPathArray = (array: Menus[], current: Menus, pid: string, id: string) => {
+    const result = [String(current[id])]
+    const getPath = (item: Menus) => {
       if (item && item[pid]) {
         result.unshift(String(item[pid]))
         getPath(queryArray(array, item[pid], id))
@@ -121,16 +130,6 @@ const Menus = ({ siderFold, darkTheme, navOpenKeys, changeOpenKeys, menu, locati
       {menuItems}
     </Menu>
   )
-}
-
-Menus.propTypes = {
-  menu: PropTypes.array,
-  siderFold: PropTypes.bool,
-  darkTheme: PropTypes.bool,
-  navOpenKeys: PropTypes.array,
-  changeOpenKeys: PropTypes.func,
-  location: PropTypes.object,
-  tabList: PropTypes.array,
 }
 
 export default Menus

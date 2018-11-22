@@ -1,48 +1,81 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Cascader, Form, Row, Col, Input, Select, Radio, DatePicker, Button, Icon, Tooltip, Modal, Checkbox, Message } from 'antd'
-import { config, GetQueryString, levelcodeToArray } from 'utils'
+import { Cascader, Form, Row, Col, Input, Select, Radio, DatePicker, Button, Icon, Tooltip, Modal, Checkbox, message } from 'antd'
+import { levelcodeToArray } from '@/utils'
 import queryString from 'query-string'
 import styles from './filter.less'
+import { ColumnProps } from 'antd/lib/table';
+import { FetchData } from 'global';
 
 
-const { APIV2 } = config
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
 const Option = Select.Option
 const { RangePicker } = DatePicker
 const CheckboxGroup = Checkbox.Group
 const FormItem = Form.Item
-const InputGroup = Input.Group;
+const InputGroup = Input.Group
 
-class Filter extends Component {
-  constructor(props) {
+interface IFilterProps<T> {
+  filterList: FileList[],
+  filterGrade: FileList[],
+  filterForm: object,
+  tableList: Array<ColumnProps<T>>,
+  otherList: any,
+  addBtn: boolean,
+  exportBtn: boolean,
+  localName: string,
+  outParams: object,
+  fetch: FetchData,
+}
+
+interface IFiterState {
+  grade: boolean,
+  setModal: boolean,
+  filterForm: object,
+  emptyForm: object,
+  initForm: object,
+  addBtn: boolean,
+  exportBtn: boolean,
+  tableAll: Array<{ value: string, label: string }>,
+  tableDefault: string[],
+  isMobile: boolean,
+  isPhone: boolean,
+  defaultTop: number,
+  setList: string[],
+  btnClick: boolean,
+}
+
+class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
+  constructor(props: IFilterProps<T>) {
     super(props)
     const { filterForm, addBtn, exportBtn, tableList, otherList, localName } = this.props
-    let tableAll = [...tableList, ...otherList]
-    let checkboxList = []
-    for (let i in tableAll) {
+    const tableAll = [...tableList, ...otherList]
+    const checkboxList: Array<{ value: string, label: string }> = []
+    for (const i in tableAll) {
       checkboxList[i] = {
         value: tableAll[i].key,
         label: tableAll[i].title
       }
     }
-    let checkboxDefault = []
-    if (window.localStorage.getItem(localName)) {
-      checkboxDefault = window.localStorage.getItem(localName).split(',');
+    let checkboxDefault: string[] = []
+    const LocalName =  window.localStorage.getItem(localName);
+    if (LocalName) {
+      checkboxDefault = LocalName.split(',');
     } else {
-      for (let i in tableList) {
-        checkboxDefault[i] = tableList[i].key
+      for (const i in tableList) {
+        const Key = tableList[i].key;
+        checkboxDefault[i] = Key ? Key + '' : '';
       }
     }
     this.state = {
       grade: false,
       setModal: false,
-      filterForm: filterForm,
+      filterForm,
       emptyForm: JSON.parse(JSON.stringify(filterForm)),
       initForm: JSON.parse(JSON.stringify(filterForm)),
-      addBtn: addBtn,
-      exportBtn: exportBtn,
+      addBtn,
+      exportBtn,
       tableAll: checkboxList,
       tableDefault: checkboxDefault,
       isMobile: document.body.clientWidth < 350,
@@ -53,10 +86,10 @@ class Filter extends Component {
     }
   }
 
-  componentWillMount() {
-    let { filterForm, initForm } = this.state
-    let hash = window.location.hash
-    let params = queryString.parse(hash.substring(hash.indexOf('?'), hash.length));
+  public componentWillMount() {
+    const { filterForm, initForm } = this.state
+    const hash = window.location.hash
+    const params = queryString.parse(hash.substring(hash.indexOf('?'), hash.length));
     if (hash.indexOf('?') > -1) {
       this.setState({
         filterForm: params,
@@ -67,26 +100,26 @@ class Filter extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps) {
   }
 
-  openSetModal() {
+  public openSetModal() {
     this.setState({
       setModal: true
     })
   }
 
-  setCancel = () => {
+  public setCancel = () => {
     this.setState({
       setModal: false
     })
   }
 
-  saveTable = () => {
-    let { filterForm, tableDefault, setList } = this.state
+  public saveTable = () => {
+    const { filterForm, tableDefault, setList } = this.state
     const { tableList, outParams, fetch } = this.props;
-    let keyList = setList.length ? setList : tableDefault; // 获取表头key 数组
-    let tableNameList = [];
+    const keyList = setList.length ? setList : tableDefault; // 获取表头key 数组
+    const tableNameList = [];
     keyList.map((item) => { // 通过key 匹配 name
       tableList.map((items) => {
         if (items.key === item) {
@@ -94,7 +127,7 @@ class Filter extends Component {
         }
       })
     })
-    let params = {
+    const params = {
       // 打包到任伟
       url: fetch.url,
       // 开发、测试
@@ -102,10 +135,10 @@ class Filter extends Component {
       headerkey: keyList.join(','),
       headername: tableNameList.join(','),
     }
-    let urlParams = getUrlParams(Object.assign(filterForm, outParams, params)) // 转换为url格式参数
+    const urlParams = getUrlParams(Object.assign(filterForm, outParams, params)) // 转换为url格式参数
     function getUrlParams(params) {
       let urlParams = '';
-      for (let i in params) {
+      for (const i in params) {
         urlParams += `${i}=${params[i]}&`
       }
       return urlParams.substring(0, urlParams.length - 1)
@@ -113,8 +146,8 @@ class Filter extends Component {
     window.location.href = `${APIV2}/sys/export/export?${urlParams}`;
   }
 
-  settingTable = () => {
-    let { tableDefault, setList } = this.state;
+  public settingTable = () => {
+    const { tableDefault, setList } = this.state;
     this.setState({ loading: true })
     setTimeout(() => {
       this.setState({
@@ -125,9 +158,9 @@ class Filter extends Component {
     }, 1500);
   }
 
-  filterItem(item, grade) {
+  public filterItem(item, grade) {
     const { getFieldDecorator } = this.props.form
-    let { initForm } = this.state;
+    const { initForm } = this.state;
     if (item.display !== undefined) {
       if (!item.display) {
         return null
@@ -136,8 +169,8 @@ class Filter extends Component {
     const self = this
     let Dom = null
 
-    let itemChange = (value) => {
-      let filterForm = self.state.filterForm
+    const itemChange = (value) => {
+      const filterForm = self.state.filterForm
       if (item.type === 'seTime') {
         filterForm[item.value[0]] = value[0] ? value[0].format('YYYY-MM-DD') : ''
         filterForm[item.value[1]] = value[1] ? value[1].format('YYYY-MM-DD') : ''
@@ -154,9 +187,9 @@ class Filter extends Component {
       item.onchange ? item.onchange(value) : null
     }
 
-    let inputChange = (e) => {
-      let value = e.target.value
-      let filterForm = this.state.filterForm
+    const inputChange = (e) => {
+      const value = e.target.value
+      const filterForm = this.state.filterForm
       if (item.type === 'between') {
         filterForm[item.type === 'between' ? e.target.getAttribute('data-key') : item.key] = value
       } else if (item.type === 'lower') {
@@ -165,16 +198,16 @@ class Filter extends Component {
         filterForm[item.key] = value
       }
       self.setState({
-        filterForm: filterForm
+        filterForm
       })
     }
 
     switch (item.type) {
       case 'cascader':
-        Dom = <Cascader changeOnSelect options={item.options} data-key={item.key} onChange={itemChange} placeholder={item.placeholder} />
+        Dom = <Cascader changeOnSelect={true} options={item.options} data-key={item.key} onChange={itemChange} placeholder={item.placeholder} />
         break;
       case 'between':
-        Dom = <InputGroup compact>
+        Dom = <InputGroup compact={true}>
           {
             getFieldDecorator(item.value[0], {
               initialValue: initForm[item.value[0]]
@@ -182,7 +215,7 @@ class Filter extends Component {
               <Input style={{ width: '40%', textAlign: 'left', marginTop: 3 }} data-key={item.value[0]} onChange={inputChange} placeholder={item.placeholder[0]} />
             )
           }
-          <Input style={{ width: '20%', borderLeft: 0, marginTop: 3, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled />
+          <Input style={{ width: '20%', borderLeft: 0, marginTop: 3, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder="~" disabled={true} />
           {
             getFieldDecorator(item.value[1], {
               initialValue: initForm[item.value[1]]
@@ -193,8 +226,8 @@ class Filter extends Component {
         </InputGroup>
         break;
       case 'lower':
-        Dom = <InputGroup compact>
-          <Input style={{ width: '60%', marginTop: 3, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder={item.placeholder[0]} disabled />
+        Dom = <InputGroup compact={true}>
+          <Input style={{ width: '60%', marginTop: 3, pointerEvents: 'none', backgroundColor: '#fff' }} placeholder={item.placeholder[0]} disabled={true} />
           {
             getFieldDecorator(item.value[1], {
               initialValue: initForm[item.value[1]]
@@ -210,13 +243,13 @@ class Filter extends Component {
       case 'select':
         Dom =
           <Select placeholder={item.placeholder} data-key={item.key} onChange={itemChange}>
-            {item.options.map((item) => { return (<Option key={item.key} value={item.key + ''}>{item.label}</Option>) })}
+            {item.options.map((item) => (<Option key={item.key} value={item.key + ''}>{item.label}</Option>))}
           </Select>
         break;
       case 'radio':
         Dom =
           <RadioGroup data-key={item.key} onChange={itemChange}>
-            {item.options.map((item) => { return (<RadioButton key={item.key} value={item.key}>{item.label}</RadioButton>) })}
+            {item.options.map((item) => (<RadioButton key={item.key} value={item.key}>{item.label}</RadioButton>))}
           </RadioGroup>
         break;
       case 'dateTime':
@@ -229,7 +262,7 @@ class Filter extends Component {
         Dom = <RangePicker width={'100%'} data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={[item.placeholder[0], item.placeholder[1]]} onChange={itemChange} />
         break;
     }
-    let formItemLayout = {
+    const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
         sm: { span: 6 },
@@ -239,7 +272,7 @@ class Filter extends Component {
         sm: { span: 18 },
       },
     };
-    let defaultLayout = {
+    const defaultLayout = {
       span: 4,
       xl: 4,
       lg: 6,
@@ -285,7 +318,7 @@ class Filter extends Component {
     )
   }
 
-  checkBoxChange = (val) => {
+  public checkBoxChange = (val) => {
     if (val.length > 0) {
       this.setState({
         setList: val,
@@ -301,8 +334,8 @@ class Filter extends Component {
     }
   }
 
-  reset = () => {
-    let { emptyForm } = this.state;
+  public reset = () => {
+    const { emptyForm } = this.state;
     this.setState({
       initForm: JSON.parse(JSON.stringify(emptyForm)),
       filterForm: JSON.parse(JSON.stringify(emptyForm)),
@@ -317,17 +350,17 @@ class Filter extends Component {
     })
   }
 
-  render() {
+  public render() {
     const self = this
     const { filterForm, addBtn, tableAll, tableDefault, isMobile, loading, btnClick } = this.state
     const { filterList, filterGrade } = this.props
-    let checkBoxParams = {
+    const checkBoxParams = {
       options: tableAll,
       defaultValue: tableDefault,
       onChange: this.checkBoxChange,
     }
-    let search = () => {
-      let { filterForm, initForm } = this.state;
+    const search = () => {
+      const { filterForm, initForm } = this.state;
       let href = window.location.href;
       if (href.indexOf('?') > -1) {
         href = href.substring(0, href.indexOf('?'))
@@ -335,7 +368,7 @@ class Filter extends Component {
       window.location.href = `${href}?${queryString.stringify(filterForm)}`
       self.props.onSearch(filterForm)
     }
-    let gradeToggle = () => {
+    const gradeToggle = () => {
       if (self.state.grade) {
         self.setState({
           grade: false,
@@ -350,7 +383,7 @@ class Filter extends Component {
         document.querySelector('#dataTable').style.marginTop = (document.querySelector('#gradeForm').clientHeight - document.querySelector('#defaultForm').clientHeight) + 'px';
       }
     }
-    let addFun = () => {
+    const addFun = () => {
       self.props.onAdd(self.state.addBtn)
     }
     const btnLayout = {

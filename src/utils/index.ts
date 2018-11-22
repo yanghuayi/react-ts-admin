@@ -52,7 +52,7 @@ export const queryURL = (name: string) => {
  * @param   {String}    keyAlias
  * @return  {Array}
  */
-export const queryArray = (array: T[], key, keyAlias = 'key') => {
+export const queryArray = (array: any, key: string = 'id', keyAlias: string = 'key') => {
   if (!(array instanceof Array)) {
     return null
   }
@@ -73,13 +73,13 @@ export const queryArray = (array: T[], key, keyAlias = 'key') => {
  */
 export const arrayToTree = (array: any, id = 'id', pid = 'pid', children = 'children') => {
   const data = lodash.cloneDeep(array)
-  const result: <any>[] = []
+  const result: any = []
   const hash = {}
-  data.forEach((item, index) => {
+  data.forEach((item: any, index: number) => {
     hash[data[index][id]] = data[index]
   })
 
-  data.forEach((item) => {
+  data.forEach((item: any) => {
     const hashVP = hash[item[pid]]
     if (hashVP) {
       !hashVP[children] && (hashVP[children] = [])
@@ -89,4 +89,17 @@ export const arrayToTree = (array: any, id = 'id', pid = 'pid', children = 'chil
     }
   })
   return result
+}
+
+export function levelcodeToArray(levelcode: string): string[] {
+  if (!levelcode) {
+    return [];
+  }
+  const _arr = levelcode.split("/");
+  const _ret: any = [];
+  _arr.length = _arr.length - 1;
+  _arr.forEach((itm) => {
+    _ret.push(_ret[_ret.length - 1] ? _ret[_ret.length - 1] + itm + "/" : itm + "/");
+  });
+  return _ret;
 }

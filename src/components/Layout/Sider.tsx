@@ -1,13 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Icon, Switch } from 'antd'
-import { config } from 'utils'
+import config from '@/utils/config'
 import styles from './Layout.less'
 import Menus from './Menu'
 
+interface ISiderProps {
+  siderFold: boolean,
+  darkTheme: boolean,
+  location: Location,
+  changeTheme: () => void,
+  navOpenKeys: string[],
+  changeOpenKeys: (keys: string[]) => void,
+  menu: Menus[],
+  logo: any,
+  tabList: TabList[],
+}
+
 const Sider = ({
   siderFold, darkTheme, location, changeTheme, navOpenKeys, changeOpenKeys, menu, logo, tabList
-}) => {
+}: ISiderProps) => {
   const menusProps = {
     menu,
     siderFold,
@@ -25,24 +35,7 @@ const Sider = ({
         {siderFold ? '' : <span>{config.name}</span>}
       </div>
       <Menus {...menusProps} />
-      {/* {!siderFold ? <div className={styles.switchtheme}>
-        <span><Icon type="bulb" />Switch Theme</span>
-        <Switch onChange={changeTheme} defaultChecked={darkTheme} checkedChildren="Dark" unCheckedChildren="Light" />
-      </div> : ''} */}
     </div>
   )
 }
-
-Sider.propTypes = {
-  menu: PropTypes.array,
-  siderFold: PropTypes.bool,
-  darkTheme: PropTypes.bool,
-  location: PropTypes.object,
-  changeTheme: PropTypes.func,
-  navOpenKeys: PropTypes.array,
-  changeOpenKeys: PropTypes.func,
-  logo: PropTypes.string,
-  tabList: PropTypes.array.isRequired,
-}
-
 export default Sider

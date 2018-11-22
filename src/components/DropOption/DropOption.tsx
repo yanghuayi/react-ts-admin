@@ -1,8 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Dropdown, Button, Icon, Menu } from 'antd'
+import { ClickParam } from 'antd/lib/menu';
 
-const DropOption = ({ onMenuClick, menuOptions = [], buttonStyle, dropdownProps, record }) => {
+interface IOption {
+  key: string,
+  disabled: boolean,
+  name: (record: object) => string | string,
+}
+
+interface IDropOption {
+  onMenuClick: (e: ClickParam) => void,
+  menuOptions: IOption[],
+  buttonStyle: object,
+  dropdownProps: object,
+  record: object,
+}
+
+const DropOption = ({ onMenuClick, menuOptions = [], buttonStyle, dropdownProps, record }: IDropOption) => {
   const menu = menuOptions.map(item => <Menu.Item key={item.key} disabled={item.disabled}>{typeof item.name === 'function' ? item.name(record) : item.name}</Menu.Item>)
   return (
     <Dropdown
