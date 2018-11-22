@@ -10,6 +10,11 @@ declare module '*.less' {
   export default content;
 }
 
+declare module '@' {
+  const content: any;
+  export default content;
+}
+
 interface Date {
   format: (date: string) => string
 } 

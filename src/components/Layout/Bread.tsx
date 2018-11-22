@@ -1,16 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Breadcrumb, Icon } from 'antd'
+import { Breadcrumb } from 'antd'
 import { Link } from 'react-router-dom'
 import pathToRegexp from 'path-to-regexp'
-import { queryArray } from 'utils'
+import { queryArray } from '@/utils'
 import styles from './Layout.less'
 
 const Bread = ({ menu, location }) => {
   // 匹配当前路由
-  let pathArray = []
+  const pathArray = []
   let current
-  for (let index in menu) {
+  for (const index in menu) {
     if (menu[index].route && pathToRegexp(menu[index].route).exec(location.pathname)) {
       current = menu[index]
       break
@@ -24,7 +24,7 @@ const Bread = ({ menu, location }) => {
     }
   }
 
-  let paramMap = {}
+  const paramMap = {}
   if (!current) {
     pathArray.push(menu[0] || {
       id: 1,
@@ -38,8 +38,8 @@ const Bread = ({ menu, location }) => {
   } else {
     getPathArray(current)
 
-    let keys = []
-    let values = pathToRegexp(current.route, keys).exec(location.pathname.replace('#', ''))
+    const keys = []
+    const values = pathToRegexp(current.route, keys).exec(location.pathname.replace('#', ''))
     if (keys.length) {
       keys.forEach((currentValue, index) => {
         if (typeof currentValue.name !== 'string') {

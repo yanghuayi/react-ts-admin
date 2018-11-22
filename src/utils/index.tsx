@@ -1,3 +1,4 @@
+import lodash from 'lodash';
 /**
  * 对象参数转换为url参数
  * @param   {Object}
@@ -70,9 +71,9 @@ export const queryArray = (array: T[], key, keyAlias = 'key') => {
  * @param   {String}    children
  * @return  {Array}
  */
-export const arrayToTree = (array, id = 'id', pid = 'pid', children = 'children') => {
+export const arrayToTree = (array: any, id = 'id', pid = 'pid', children = 'children') => {
   const data = lodash.cloneDeep(array)
-  const result = []
+  const result: <any>[] = []
   const hash = {}
   data.forEach((item, index) => {
     hash[data[index][id]] = data[index]
