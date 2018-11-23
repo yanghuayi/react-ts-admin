@@ -1,77 +1,83 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { Cascader, Form, TreeSelect, Input, Select, Radio, DatePicker, Button, Icon, Modal, Checkbox } from 'antd'
+import { Cascader, Form, TreeSelect, Input, Select, Radio, DatePicker, Modal } from 'antd'
+import { WrappedFormUtils } from 'antd/lib/form/Form';
+import { ModalProps } from 'antd/lib/modal';
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
 const Option = Select.Option
-const { MonthPicker, RangePicker } = DatePicker
-const CheckboxGroup = Checkbox.Group
+const { RangePicker } = DatePicker
 const FormItem = Form.Item
 const { TextArea } = Input
 
-class ModalForm extends Component {
-  constructor(props) {
+interface IModalProps {
+  form: WrappedFormUtils,
+  formData: object,
+  formList: FilterList[],
+  modalProps: ModalProps,
+  onSubmit: (params: any) => void,
+}
+
+class ModalForm extends Component<IModalProps> {
+  constructor(props: IModalProps) {
     super(props)
     this.state = {
     }
   }
 
-  item(item) {
+  public item(item: any) {
     const { form: { getFieldDecorator }, formData } = this.props
     if (item.display !== undefined) {
       if (!item.display) {
         return null
       }
     }
-    const self = this
     let Dom = null
-
-    let itemChange = (value) => {
+    const itemChange = (value: any) => {
       item.onchange ? item.onchange(value) : null
     }
 
-    let inputChange = (e) => {
-      item.onchange ? item.onchange(value) : null
+    const inputChange = (e: any) => {
+      item.onchange ? item.onchange(e.target.value) : null
     }
 
     switch (item.type) {
       case 'cascader':
-        Dom = <Cascader disabled={item.disabled} changeOnSelect options={item.options} onChange={itemChange} placeholder={item.placeholder} />
+        Dom = <Cascader disabled={item.disabled} changeOnSelect={true} options={item.options} onChange={itemChange} placeholder={item.placeholder} />
         break;
       case 'treeSelect':
-        Dom = <TreeSelect disabled={item.disabled} treeData={item.options} treeCheckable onChange={itemChange} placeholder={item.placeholder} />
+        Dom = <TreeSelect disabled={item.disabled} treeData={item.options} treeCheckable={true} onChange={itemChange} placeholder={item.placeholder} />
         break;
       case 'input':
-        Dom = <Input disabled={item.disabled} onChange={inputChange} addonAfter={item.unit} placeholder={item.placeholder} initialValue={item.value} />
+        Dom = <Input disabled={item.disabled} onChange={inputChange} addonAfter={item.unit} placeholder={item.placeholder} value={item.value} />
         break;
       case 'password':
         Dom = <Input disabled={item.disabled} type="password" onChange={inputChange} addonAfter={item.unit} placeholder={item.placeholder} />
         break;
       case 'textarea':
-        Dom = <TextArea row={item.row} disabled={item.disabled} placeholder={item.placeholder} />
+        Dom = <TextArea rows={item.row} disabled={item.disabled} placeholder={item.placeholder} />
         break;
       case 'select':
         Dom =
           <Select disabled={item.disabled} placeholder={item.placeholder} onChange={itemChange}>
             {/* <Option value="">全部</Option> */}
-            {item.options.map((item) => { return (<Option key={item.key} value={item.key + ''}>{item.label}</Option>) })}
+            {item.options.map((item: any) => (<Option key={item.key} value={item.key + ''}>{item.label}</Option>))}
           </Select>
         break;
       case 'radio':
         Dom =
           <RadioGroup disabled={item.disabled} onChange={itemChange}>
-            {item.options.map((item) => { return (<RadioButton key={item.key} value={item.key}>{item.label}</RadioButton>) })}
+            {item.options.map((item: any) => (<RadioButton key={item.key} value={item.key}>{item.label}</RadioButton>))}
           </RadioGroup>
         break;
       case 'dateTime':
         Dom = <RangePicker disabled={item.disabled} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD HH:mm:ss" placeholder={[item.placeholder[0], item.placeholder[1]]} onChange={itemChange} />
         break;
       case 'selectTime':
-        Dom = <DatePicker styles={{width:'300px'}} disabled={item.disabled} showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }} format="YYYY-MM-DD HH:mm:ss" placeholder={item.placeholder} onChange={itemChange} />
+        Dom = <DatePicker style={{width:'300px'}} disabled={item.disabled} showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }} format="YYYY-MM-DD HH:mm:ss" placeholder={item.placeholder} onChange={itemChange} />
         break;
     }
-    let formItemLayout = {
+    const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
         sm: { span: 4 },
@@ -81,27 +87,29 @@ class ModalForm extends Component {
         sm: { span: 20 },
       },
     };
+    const Key: string = item.key;
     return (
       <FormItem label={item.label} {...formItemLayout} key={item.key} data-key={item.key}>
-        {getFieldDecorator(item.key, { ...item.params, initialValue: formData[item.key] })(Dom)}
+        {getFieldDecorator(Key, { ...item.params, initialValue: formData[item.key] })(Dom)}
       </FormItem>
     )
   }
 
-  render() {
+  public render() {
     const { formList, modalProps, onSubmit } = this.props
     modalProps.onOk = () => {
       this.props.form.validateFields((err, values) => {
         if (err !== null && err) {
           return false
         } else {
-          onSubmit(values)
+          onSubmit(values);
+          return true;
         }
       })
     }
     return (
       <Modal {...modalProps}>
-        <Form onSubmit={this.handleSubmit}>
+        <Form>
           {
             formList.map((item) => {
               return this.item(item)

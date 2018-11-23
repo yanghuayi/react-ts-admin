@@ -1,21 +1,21 @@
-import React from 'react'
+import React, { RefObject } from 'react'
 import { ColumnProps } from 'antd/lib/table';
-import { PaginationProps } from 'antd/lib/pagination';
+import { PaginationConfig, PaginationProps } from 'antd/lib/pagination';
 import { Table, message, Popconfirm } from 'antd'
 import DropOption from '../DropOption/DropOption'
 import styles from './MTable.less'
 
-interface IDataTableProps<T> {
+interface IDataTableProps {
   otherList: any,
   fetch: FetchData,
   localName: string,
   rowKey: string,
-  pagination: PaginationProps,
+  pagination: PaginationConfig | false,
   scroll: { x?: number, y?: number },
   fetchError: (err: any) => void,
   menuClick: (key: string, data: any) => void,
   opreat: Operat[] | boolean,
-  columns: Array<ColumnProps<T>>,
+  columns: Array<ColumnProps<object>>,
 }
 
 interface IDataTableState {
@@ -23,11 +23,12 @@ interface IDataTableState {
   dataSource: object[],
   fetch: FetchData,
   fetchData: { rows: number, page: number },
-  pagination: PaginationProps,
+  pagination: PaginationConfig | false,
 }
 
-class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> {
-  constructor(props: IDataTableProps<T>) {
+class DataTable extends React.Component<IDataTableProps, IDataTableState> {
+  public dataTable: RefObject<Table<object>>;
+  constructor(props: IDataTableProps) {
     super(props)
     let {
       fetch,
@@ -52,6 +53,7 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
       },
       pagination,
     }
+    this.dataTable = React.createRef();
   }
 
   public componentDidMount() {
@@ -61,7 +63,7 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
     }
   }
 
-  public componentWillReceiveProps(nextProps: IDataTableProps<T>) {
+  public componentWillReceiveProps(nextProps: IDataTableProps) {
     if (JSON.stringify(this.state.fetch.data) !== JSON.stringify(nextProps.fetch.data)) {
       this.setState({
         fetch: JSON.parse(JSON.stringify(nextProps.fetch)),
@@ -79,19 +81,21 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
 
   public handleTableChange = (pagination: PaginationProps, filters: any) => { // 第三个参数 sorter 排序
     const pager = this.state.pagination
-    const { fetchData } = this.state
-    if (pager.current !== pagination.current || fetchData.rows !== pagination.pageSize || fetchData.page !== pagination.current) {
-      pager.current = pagination.current
-      this.setState({
-        pagination: pager,
-        fetchData: {
-          rows: pagination.pageSize,
-          page: pagination.current,
-          ...filters,
-        },
-      }, () => {
-        this.fetch('change')
-      })
+    if (typeof pager !== 'boolean') {
+      const { fetchData } = this.state
+      if (pager.current !== pagination.current || fetchData.rows !== pagination.pageSize || fetchData.page !== pagination.current) {
+        pager.current = pagination.current
+        this.setState({
+          pagination: pager,
+          fetchData: {
+            rows: pagination.pageSize,
+            page: pagination.current,
+            ...filters,
+          },
+        }, () => {
+          this.fetch('change')
+        })
+      }
     }
   }
 
@@ -109,7 +113,7 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
     }).then((data: any) => {
       const result = data.result
       const tableData = data.entity
-      if (!this.refs.DataTable) {
+      if (!this.dataTable) {
         return
       }
       if (!result.resultCode) {
@@ -135,7 +139,7 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
 
   public render() {
     const self = this
-    const { fetch, rowKey, scroll, opreat, ...tableProps } = this.props
+    const { fetch, rowKey, scroll, opreat, columns, ...tableProps } = this.props
     const { loading, dataSource, pagination } = this.state
     // if (!scroll) {
     //   scroll = {
@@ -145,9 +149,9 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
     //   scroll.y = document.body.clientHeight - 240
     // }
     if (opreat) {
-      if (tableProps.columns[tableProps.columns.length - 1].title !== '操作') {
+      if (columns[columns.length - 1].title !== '操作') {
         if (typeof opreat === 'object' && opreat.length < 5) {
-          tableProps.columns.push({
+          columns.push({
             title: '操作',
             dataIndex: 'action',
             key: 'action',
@@ -172,7 +176,7 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
           })
         } else {
           const OPreat = typeof opreat === 'object' ? opreat : [];
-          tableProps.columns.push({
+          columns.push({
             title: '操作',
             dataIndex: 'action',
             key: 'action',
@@ -184,14 +188,15 @@ class DataTable<T> extends React.Component<IDataTableProps<T>, IDataTableState> 
       }
     }
     return (<Table
-      ref="DataTable"
+      ref={this.dataTable}
       size="middle"
-      id="dataTable"
+      html-id="dataTable"
       bordered={true}
       scroll={scroll}
       className={styles.dataTable}
       loading={loading}
       onChange={this.handleTableChange}
+      columns={columns}
       {...tableProps}
       rowKey={record => record[rowKey]}
       pagination={pagination}

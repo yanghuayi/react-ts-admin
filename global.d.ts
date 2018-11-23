@@ -1,10 +1,16 @@
 import { ColumnProps } from 'antd/lib/table';
-import { PaginationProps } from 'antd/lib/pagination';
+import { PaginationConfig } from 'antd/lib/pagination';
 import Api from '@/api/api';
 
 declare global {
+
   interface Window {
-    API: Api
+    API: Api,
+    BMap: any,
+    BMapLib: any,
+    BMAP_ANCHOR_TOP_RIGHT: any,
+    BMAP_DRAWING_CIRCLE: any,
+    BMAP_DRAWING_POLYGON: any,
   }
 
   interface Routers {
@@ -63,7 +69,7 @@ declare global {
   }
   
   
-  interface IFilterTable<T> {
+  interface IFilterTable {
     filterList: FilterList[],
     filterGrade: FilterList[],
     filterForm: object,
@@ -72,10 +78,10 @@ declare global {
     exportBtn: boolean,
     rowKey: string,
     opreat: Operat | boolean,
-    tableList: Array<ColumnProps<T>>,
+    tableList: Array<ColumnProps<object>>,
     otherList: any,
     localName: string,
-    pagination: PaginationProps | boolean,
+    pagination: PaginationConfig | false,
     menuClick: (key: string, data: any) => void,
     scroll: { x?: number, y?: number },
     onAdd: () => void,

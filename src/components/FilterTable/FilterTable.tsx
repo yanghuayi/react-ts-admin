@@ -11,7 +11,7 @@ interface IFilterTableState {
   showFilter: boolean,
 }
 
-class FilterTable<T> extends Component<IFilterTable<T>, IFilterTableState> {
+class FilterTable extends Component<IFilterTable, IFilterTableState> {
   public filterRefs = null
   constructor(props: any) {
     super(props)
@@ -88,7 +88,7 @@ class FilterTable<T> extends Component<IFilterTable<T>, IFilterTableState> {
     }
   }
 
-  public componentWillReceiveProps(nextProps: IFilterTable<T>) {
+  public componentWillReceiveProps(nextProps: IFilterTable) {
     const { filterParams, tableParams } = this.state
     filterParams.filterList = nextProps.filterList
     filterParams.filterGrade = nextProps.filterGrade

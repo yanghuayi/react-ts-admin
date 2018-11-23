@@ -14,7 +14,7 @@ interface IApiList {
 }
 
 interface IOptions {
-  data: any,
+  data?: any,
   url: string,
   fetchType?: string,
   method?: string,

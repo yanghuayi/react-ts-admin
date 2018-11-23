@@ -8,19 +8,19 @@ import styles from './filter.less'
 
 
 
-const RadioGroup = Radio.Group
-const RadioButton = Radio.Button
-const Option = Select.Option
-const { RangePicker } = DatePicker
-const CheckboxGroup = Checkbox.Group
-const FormItem = Form.Item
-const InputGroup = Input.Group
+const RadioGroup = Radio.Group;
+const RadioButton = Radio.Button;
+const Option = Select.Option;
+const { RangePicker } = DatePicker;
+const CheckboxGroup = Checkbox.Group;
+const FormItem = Form.Item;
+const InputGroup = Input.Group;
 
-interface IFilterProps<T> {
+interface IFilterProps {
   filterList: FilterList[],
   filterGrade: FilterList[],
   filterForm: object,
-  tableList: Array<ColumnProps<T>>,
+  tableList: Array<ColumnProps<object>>,
   otherList: any,
   addBtn: boolean,
   exportBtn: boolean,
@@ -51,9 +51,9 @@ interface IFiterState {
   loading: boolean,
 }
 
-class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
-  constructor(props: IFilterProps<T>) {
-    super(props)
+class Filter extends Component<IFilterProps, IFiterState> {
+  constructor(props: IFilterProps) {
+    super(props);
     const { filterForm, addBtn, exportBtn, tableList, otherList, localName } = this.props
     const tableAll = [...tableList, ...otherList]
     const checkboxList: Array<{ value: string, label: string }> = []
@@ -118,7 +118,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
   }
 
   public saveTable = () => {
-    const { filterForm, tableDefault, setList } = this.state
+    const { filterForm, tableDefault, setList } = this.state;
     const { tableList, outParams, fetch } = this.props;
     const keyList = setList.length ? setList : tableDefault; // 获取表头key 数组
     const tableNameList: string[] = [];
@@ -129,7 +129,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
           tableNameList.push(title);
         }
       })
-    })
+    });
     const params = {
       // 打包到任伟
       url: fetch.url,
@@ -137,29 +137,29 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       // url: fetch.url.substring(7),
       headerkey: keyList.join(','),
       headername: tableNameList.join(','),
-    }
+    };
     const urlParams = getUrlParams(Object.assign(filterForm, outParams, params)) // 转换为url格式参数
     function getUrlParams(params: object) {
       let urlParams = '';
       for (const i in params) {
-        urlParams += `${i}=${params[i]}&`
+        urlParams += `${i}=${params[i]}&`;
       }
       return urlParams.substring(0, urlParams.length - 1)
     }
-    // window.location.href = `${APIV2}/sys/export/export?${urlParams}`;
-  }
+    window.location.href = `/sys/export/export?${urlParams}`;
+  };
 
   public settingTable = () => {
     const { tableDefault, setList } = this.state;
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     setTimeout(() => {
       this.setState({
         loading: false,
         setModal: false,
-      })
+      });
       this.props.tableSetFun(setList.length > 0 ? setList : tableDefault)
     }, 1500);
-  }
+  };
 
   public filterItem(item: FilterList, grade?: boolean) {
     const { getFieldDecorator } = this.props.form
@@ -169,54 +169,54 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
         return null
       }
     }
-    const self = this
-    let Dom = null
+    const self = this;
+    let Dom = null;
 
     const itemChange = (value: any) => {
-      const filterForm = self.state.filterForm
+      const filterForm = self.state.filterForm;
       if (item.type === 'seTime' && item.value) {
-        filterForm[item.value[0]] = value[0] ? value[0].format('YYYY-MM-DD') : ''
-        filterForm[item.value[1]] = value[1] ? value[1].format('YYYY-MM-DD') : ''
+        filterForm[item.value[0]] = value[0] ? value[0].format('YYYY-MM-DD') : '';
+        filterForm[item.value[1]] = value[1] ? value[1].format('YYYY-MM-DD') : '';
       } else if (item.type === 'cascader') {
-        filterForm[item.key] = JSON.parse(JSON.stringify(value)).pop()
+        filterForm[item.key] = JSON.parse(JSON.stringify(value)).pop();
       } else if (item.type === 'oneTime') {
-        filterForm[item.key] = value ? value.format('YYYY-MM-DD') : ''
+        filterForm[item.key] = value ? value.format('YYYY-MM-DD') : '';
       } else if (item.type === 'select') {
-        filterForm[item.key] = value ? value : ''
+        filterForm[item.key] = value ? value : '';
       }
       self.setState({
         filterForm,
-      })
+      });
       if (item.onchange) {
         item.onchange(value)
       }
-    }
+    };
 
     const inputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      const filterForm = this.state.filterForm
+      const value = e.target.value;
+      const filterForm = this.state.filterForm;
       if (item.type === 'between') {
         const Key = item.type === 'between' ? e.target.getAttribute('data-key') : item.key;
         if (Key) {
-          filterForm[Key] = value
+          filterForm[Key] = value;
         }
       } else if (item.type === 'lower') {
         const Key = item.type === 'lower' ? e.target.getAttribute('data-key') : item.key;
         if (Key) {
-          filterForm[Key] = value
+          filterForm[Key] = value;
         }
       } else {
-        filterForm[item.key] = value
+        filterForm[item.key] = value;
       }
       self.setState({
         filterForm
-      })
-    }
+      });
+    };
 
     switch (item.type) {
       case 'cascader':
         const PlaceHolder = typeof item.placeholder === 'string' ? item.placeholder : '';
-        Dom = <Cascader changeOnSelect={true} options={item.options} data-key={item.key} onChange={itemChange} placeholder={PlaceHolder} />
+        Dom = <Cascader changeOnSelect={true} options={item.options} data-key={item.key} onChange={itemChange} placeholder={PlaceHolder} />;
         break;
       case 'between':
         const Value = item.value ? item.value : ['', ''];
@@ -237,7 +237,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
               <Input style={{ width: '40%', textAlign: 'left', marginTop: 3, borderLeft: 0 }} data-key={Value[1]} onChange={inputChange} placeholder={PlaceHolderArr[1]} />
             )
           }
-        </InputGroup>
+        </InputGroup>;
         break;
       case 'lower':
         const ValueArr = item.value ? item.value : ['', ''];
@@ -251,35 +251,35 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
               <Input style={{ width: '40%', textAlign: 'left', marginTop: 3, borderLeft: 0 }} data-key={ValueArr[1]} onChange={inputChange} placeholder={PlaceHolderArr2[1]} />
             )
           }
-        </InputGroup>
+        </InputGroup>;
         break;
       case 'input':
         const PlaceHolder3 = typeof item.placeholder === 'string' ? item.placeholder : '';
-        Dom = <Input onChange={inputChange} data-key={item.key} addonAfter={item.unit} placeholder={PlaceHolder3} />
+        Dom = <Input onChange={inputChange} data-key={item.key} addonAfter={item.unit} placeholder={PlaceHolder3} />;
         break;
       case 'select':
         Dom =
           <Select placeholder={item.placeholder} data-key={item.key} onChange={itemChange}>
             {item.options.map((item: any) => (<Option key={item.key} value={item.key + ''}>{item.label}</Option>))}
-          </Select>
+          </Select>;
         break;
       case 'radio':
         Dom =
           <RadioGroup data-key={item.key} onChange={itemChange}>
             {item.options.map((item: any) => (<RadioButton key={item.key} value={item.key}>{item.label}</RadioButton>))}
-          </RadioGroup>
+          </RadioGroup>;
         break;
       case 'dateTime':
         const PlaceHolderArr3 = typeof item.placeholder === 'string' ? item.placeholder : '';
-        Dom = <DatePicker data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={PlaceHolderArr3} onChange={itemChange} />
+        Dom = <DatePicker data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={PlaceHolderArr3} onChange={itemChange} />;
         break;
       case 'oneTime':
         const PlaceHolder2 = typeof item.placeholder === 'string' ? item.placeholder : '';
-        Dom = <DatePicker data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={PlaceHolder2} onChange={itemChange} />
+        Dom = <DatePicker data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={PlaceHolder2} onChange={itemChange} />;
         break;
       case 'seTime':
       const PlaceHolderArr4 = typeof item.placeholder === 'object' ? item.placeholder : ['', ''];
-        Dom = <RangePicker style={{ width: '100%' }} data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={[PlaceHolderArr4[0], PlaceHolderArr4[1]]} onChange={itemChange} />
+        Dom = <RangePicker style={{ width: '100%' }} data-key={item.key} showTime={{ format: 'HH:mm:ss' }} format="YYYY-MM-DD" placeholder={[PlaceHolderArr4[0], PlaceHolderArr4[1]]} onChange={itemChange} />;
         break;
     }
     const formItemLayout = {
@@ -299,7 +299,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       md: 6,
       sm: 8,
       xs: 12,
-    }
+    };
     const gradeLayout = {
       span: 8,
       xl: 8,
@@ -307,7 +307,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       md: 12,
       sm: 12,
       xs: 12,
-    }
+    };
     return (
       grade ? <Col className={styles.gradeItem} {...gradeLayout} key={item.key}>
         <FormItem label={item.label} {...formItemLayout} className={styles.itemForm} key={item.key} data-key={item.key}>
@@ -341,11 +341,11 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       this.setState({
         setList: val,
         btnClick: true
-      })
+      });
       message.error('请至少选择一项展示内容')
       return false;
     }
-  }
+  };
 
   public reset = () => {
     const { emptyForm } = this.state;
@@ -361,7 +361,7 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       }
       window.location.href = href
     })
-  }
+  };
 
   public render() {
     const self = this
@@ -371,16 +371,16 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
       options: tableAll,
       defaultValue: tableDefault,
       onChange: this.checkBoxChange,
-    }
+    };
     const search = () => {
       const { filterForm } = this.state;
       let href = window.location.href;
       if (href.indexOf('?') > -1) {
-        href = href.substring(0, href.indexOf('?'))
+        href = href.substring(0, href.indexOf('?'));
       }
-      window.location.href = `${href}?${queryString.stringify(filterForm)}`
+      window.location.href = `${href}?${queryString.stringify(filterForm)}`;
       self.props.onSearch(filterForm)
-    }
+    };
     const DataTableDOM: any =  document.querySelector('#dataTable');
     const GradeFormDOM: any = document.querySelector('#gradeForm');
     const DefaultFormDOM: any = document.querySelector('#defaultForm');
@@ -389,27 +389,27 @@ class Filter<T> extends Component<IFilterProps<T>, IFiterState> {
         self.setState({
           grade: false,
           defaultTop: 0,
-        })
+        });
         DataTableDOM.style.marginTop = 0;
       } else {
         
         self.setState({
           grade: true,
           defaultTop: -(GradeFormDOM.clientHeight+200),
-        })
+        });
         DataTableDOM.style.marginTop = (GradeFormDOM.clientHeight - DefaultFormDOM.clientHeight) + 'px';
       }
-    }
+    };
     const addFun = () => {
       self.props.onAdd();
-    }
+    };
     const btnLayout = {
       xl: 24 - (filterList.length * 4),
       lg: 24,
       md: 24,
       sm: 24,
       xs: 24
-    }
+    };
     return (
       <div className={styles.filterWrap}>
         <Form id="defaultForm" style={{ top: this.state.defaultTop }} className={styles.defaultForm}>
