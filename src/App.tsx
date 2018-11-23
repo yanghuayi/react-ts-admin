@@ -1,6 +1,6 @@
 /* global window */
 /* global document */
-import React from 'react'
+import React, { ReactNode } from 'react'
 import NProgress from 'nprogress'
 import pathToRegexp from 'path-to-regexp'
 import { Loader, MyLayout } from '@/components'
@@ -8,21 +8,26 @@ import { BackTop, Layout, Tabs } from 'antd'
 import { Link } from 'react-router-dom'
 import classnames from 'classnames';
 import { Helmet } from 'react-helmet'
+import config from '@/utils/config';
 
 import Error from './pages/error/index'
 import '../themes/index.less'
 import './App.less'
 
-const { Content, Footer, Sider } = Layout
+const { Content, Sider } = Layout
 const { Header, styles } = MyLayout
-const { prefix, openPages, baseImgUrl } = config
+const { prefix, openPages } = config
 const TabPane = Tabs.TabPane
 
-let lastHref
+let lastHref: string;
+
+interface IAppProps {
+  children: ReactNode,
+}
 
 const App = ({
   children, dispatch, app, loading, location,
-}) => {
+}: IAppProps) => {
   const {
     user, siderFold, darkTheme, isNavbar, menuPopoverVisible, navOpenKeys, menu, permissions, logo, tabActiveKey, tabList
   } = app

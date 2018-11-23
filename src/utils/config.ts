@@ -4,4 +4,5 @@ export default {
   footerText: '激佩丝兴享融系统  © 2017 激佩丝',
   logo: '/logo_blue.png',
   icon: '/favicon.ico',
+  openPages: ['/login'],
 }
