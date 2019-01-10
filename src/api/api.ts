@@ -26,53 +26,6 @@ interface IApis {
 }
 
 export default class Api {
-  public service: any = null
-  // 请求列表，在这里添加相应接口
-  public apiList: IApiList = {
-    login: {
-      url: '/user/login',
-      fetchType: 'json',
-      method: 'post',
-    },
-    logout: {
-      url: '/user/logout',
-      fetchType: 'json',
-      method: 'post',
-    },
-    getUserInfo: {
-      url: '/user/getUserInfo',
-      fetchType: 'json',
-      method: 'post',
-    },
-    dashboard: {
-      url: '/dashboard',
-      fetchType: 'json',
-      method: 'post',
-    },
-    baseInfoAdd: {
-      url: '/customers/baseInfo/add',
-      fetchType: 'json',
-      method: 'post',
-    },
-    baseInfoUpdate: {
-      url: '/customers/baseInfo/update',
-      fetchType: 'json',
-      method: 'post',
-    },
-    baseInfoDelete: {
-      url: '/customers/baseInfo/delete',
-      fetchType: 'json',
-      method: 'post',
-    },
-    gpsToAddress: {
-      url: 'https://api.map.baidu.com/geocoder/v2/',
-      method: 'get',
-      fetchType: 'jsonp',
-    },
-  }
-  // 对外暴露方法
-  public api: IApis = {}
-  public baseUrl: string = ''
   constructor(options: { baseUrl: string }) {
     axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     this.baseUrl = this.baseUrl;
@@ -103,6 +56,59 @@ export default class Api {
       };
     }
   }
+
+  public service: any = null
+  // 请求列表，在这里添加相应接口
+  public apiList: IApiList = {
+    login: {
+      url: '/user/login',
+      fetchType: 'json',
+      method: 'post',
+    },
+    logout: {
+      url: '/user/logout',
+      fetchType: 'json',
+      method: 'post',
+    },
+    userInfo: {
+      url: '/user/getUserInfo',
+      fetchType: 'json',
+      method: 'post',
+    },
+    dashboard: {
+      url: '/dashboard',
+      fetchType: 'json',
+      method: 'post',
+    },
+    baseInfoAdd: {
+      url: '/customers/baseInfo/add',
+      fetchType: 'json',
+      method: 'post',
+    },
+    baseInfoUpdate: {
+      url: '/customers/baseInfo/update',
+      fetchType: 'json',
+      method: 'post',
+    },
+    baseInfoDelete: {
+      url: '/customers/baseInfo/delete',
+      fetchType: 'json',
+      method: 'post',
+    },
+    gpsToAddress: {
+      url: 'https://api.map.baidu.com/geocoder/v2/',
+      method: 'get',
+      fetchType: 'jsonp',
+    },
+    weather: {
+      url: '/public/now.json',
+      fetchType: 'jsonfile',
+      method: 'get',
+    },
+  }
+  // 对外暴露方法
+  public api: IApis = {}
+  public baseUrl: string = ''
 
   public request = (options: IOptions) => this.fetch(options).then((response: any) => {
     const { statusText, status } = response;
@@ -159,7 +165,7 @@ export default class Api {
           param: `${qs.stringify(data)}&callback`,
           name: `jsonp_${new Date().getTime()}`,
           timeout: 4000,
-        }, (error, result) => {
+        }, (error: Error, result: object) => {
           if (error) {
             reject(error);
           }

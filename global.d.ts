@@ -3,7 +3,6 @@ import { PaginationConfig } from 'antd/lib/pagination';
 import Api from '@/api/api';
 
 declare global {
-
   interface Window {
     API: Api,
     BMap: any,
@@ -11,6 +10,22 @@ declare global {
     BMAP_ANCHOR_TOP_RIGHT: any,
     BMAP_DRAWING_CIRCLE: any,
     BMAP_DRAWING_POLYGON: any,
+    api: any,
+  }
+
+  interface ModelApp {
+    user: object,
+    siderFold: boolean,
+    darkTheme: boolean,
+    isNavbar: boolean,
+    menuPopoverVisible: boolean,
+    navOpenKeys: string[],
+    menu: Menus[],
+    permissions: string[],
+    logo: any,
+    tabActiveKey: string,
+    tabList: TabList[],
+    locationPathname: string,
   }
 
   interface Routers {
@@ -33,7 +48,9 @@ declare global {
     mpid: string,
     name: string,
     route: string,
-    role: string,
+    role: string | string[],
+    search: string,
+    childern: any,
   }
   
   interface TabList extends Menus {

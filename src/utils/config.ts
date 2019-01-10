@@ -5,4 +5,5 @@ export default {
   logo: '/logo_blue.png',
   icon: '/favicon.ico',
   openPages: ['/login'],
+  baseUrl: process.env.NODE_ENV === 'production' ? '' : '/api',
 }

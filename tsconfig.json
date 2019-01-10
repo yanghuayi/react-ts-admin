@@ -12,8 +12,8 @@
     "rootDir": "src",
     "paths": {
       "@/*": [
-        "src/*",
-      ],
+        "src/*"
+      ]
     },
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

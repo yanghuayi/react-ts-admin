@@ -1,0 +1,51 @@
+[
+  {
+    "id": "1",
+    "icon": "dashboard",
+    "name": "首页",
+    "role": true,
+    "route": "/dashboard"
+  },
+  {
+    "id": "2",
+    "icon": "team",
+    "name": "用户管理",
+    "route": "/user",
+    "role": "/sys/user/list,/sys/org/querySelfAndChildren"
+  },
+  {
+    "id": "3",
+    "icon": "shop",
+    "name": "机构管理",
+    "route": "/org",
+    "role": "/sys/org/list,/sys/org/querySelfAndChildren"
+  },
+  {
+    "id": "4",
+    "icon": "solution",
+    "name": "角色管理",
+    "route": "/role",
+    "role": "/sys/role/list,/sys/org/querySelfAndChildren"
+  },
+  {
+    "id": "5",
+    "icon": "upload",
+    "name": "上传照片",
+    "route": "/uploadPicture",
+    "role": "/picture/getUploadSettings"
+  },
+  {
+    "id": "6",
+    "icon": "picture",
+    "name": "照片管理",
+    "route": "/managePicture",
+    "role": "/picture/list"
+  },
+  {
+    "id": "7",
+    "icon": "setting",
+    "name": "景区配置",
+    "route": "/addressSetting",
+    "role": ["/address/setShowHtml", "/address/setPriceDesc"]
+  }
+]

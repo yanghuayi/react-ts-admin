@@ -4,7 +4,7 @@ import styles from './Loader.less'
 
 interface ILoaderProps {
   spinning: boolean,
-  fullScreen: boolean,
+  fullScreen?: boolean,
 }
 
 const Loader = ({ spinning, fullScreen }: ILoaderProps) => {
