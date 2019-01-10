@@ -32,7 +32,7 @@ export default {
     // darkTheme: window.localStorage.getItem(`${prefix}darkTheme`) === 'true',
     darkTheme: true,
     isNavbar: document.body.clientWidth < 769,
-    navOpenKeys: JSON.parse(window.localStorage.getItem(`${prefix}navOpenKeys`) || '') || [],
+    navOpenKeys: JSON.parse(window.localStorage.getItem(`${prefix}navOpenKeys`) || 'false') || [],
     locationPathname: '',
     locationQuery: {},
     logo: '',

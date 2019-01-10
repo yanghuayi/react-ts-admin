@@ -61,24 +61,24 @@ export default class Api {
   // 请求列表，在这里添加相应接口
   public apiList: IApiList = {
     login: {
-      url: '/user/login',
+      url: '/sys/user/login',
       fetchType: 'json',
       method: 'post',
     },
     logout: {
-      url: '/user/logout',
+      url: '/sys/user/logout',
       fetchType: 'json',
       method: 'post',
     },
     userInfo: {
-      url: '/user/getUserInfo',
+      url: '/sys/user/getUserInfo',
       fetchType: 'json',
       method: 'post',
     },
     dashboard: {
-      url: '/dashboard',
-      fetchType: 'json',
-      method: 'post',
+      url: '/public/dashboard.json',
+      fetchType: 'jsonfile',
+      method: 'get',
     },
     baseInfoAdd: {
       url: '/customers/baseInfo/add',
