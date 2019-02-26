@@ -53,7 +53,7 @@ export default modelExtend(model, {
       const result = yield call(window.api.weather, payload)
       const { success } = result
       if (success) {
-        let data = result.data.results[0]
+        let data = result.results[0]
         const weather = {
           city: data.location.name,
           temperature: data.now.temperature,

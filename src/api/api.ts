@@ -105,6 +105,11 @@ export default class Api {
       fetchType: 'jsonfile',
       method: 'get',
     },
+    menusQuery: {
+      url: '/public/menus.json',
+      fetchType: 'jsonfile',
+      method: 'get',
+    }
   }
   // 对外暴露方法
   public api: IApis = {}
@@ -130,7 +135,7 @@ export default class Api {
       success: true,
       message: statusText,
       statusCode: status,
-      data,
+      ...data,
     });
   }).catch((error: any) => {
     const { response } = error;
