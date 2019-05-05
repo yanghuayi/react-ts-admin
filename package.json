@@ -10,22 +10,22 @@
   "devDependencies": {
     "@types/classnames": "^2.2.7",
     "@types/jsonp": "^0.2.0",
-    "@types/lodash": "^4.14.119",
+    "@types/lodash": "^4.14.123",
     "@types/nprogress": "^0.0.29",
-    "@types/qs": "^6.5.1",
-    "@types/query-string": "^6.2.0",
+    "@types/qs": "^6.5.3",
+    "@types/query-string": "^6.3.0",
     "@types/react-helmet": "^5.0.8",
-    "babel-eslint": "^9.0.0",
-    "eslint": "^5.4.0",
-    "eslint-config-umi": "^0.1.5",
-    "eslint-plugin-flowtype": "^2.50.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.11.1",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.2.2",
-    "umi": "^2.1.2",
-    "umi-plugin-react": "^1.1.1"
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-umi": "^1.4.2",
+    "eslint-plugin-flowtype": "^3.6.1",
+    "eslint-plugin-import": "^2.17.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "husky": "^2.1.0",
+    "lint-staged": "^8.1.5",
+    "umi": "^2.6.16",
+    "umi-plugin-react": "^1.7.5"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -43,8 +43,8 @@
     "jsonp": "^0.2.1",
     "lodash": "^4.17.11",
     "nprogress": "^0.2.0",
-    "qs": "^6.6.0",
-    "query-string": "^6.2.0",
+    "qs": "^6.7.0",
+    "query-string": "^6.5.0",
     "react-helmet": "^5.2.0"
   }
 }

@@ -6,23 +6,23 @@ import { message } from 'antd';
 
 interface IApiList {
   [key: string]: {
-    url: string, // 请求地址
-    fetchType?: string, // 数据格式，支持json,formData
-    method?: string, // 请求方法
-    headers?: any // 头部携带信息
-  }
+    url: string; // 请求地址
+    fetchType?: string; // 数据格式，支持json,formData
+    method?: string; // 请求方法
+    headers?: any; // 头部携带信息
+  };
 }
 
 interface IOptions {
-  data?: any,
-  url: string,
-  fetchType?: string,
-  method?: string,
-  headers?: any
+  data?: any;
+  url: string;
+  fetchType?: string;
+  method?: string;
+  headers?: any;
 }
 
 interface IApis {
-  [key: string]: any
+  [key: string]: any;
 }
 
 export default class Api {
@@ -34,8 +34,9 @@ export default class Api {
       timeout: 20000, // 请求超时时间
     });
     for (const i in this.apiList) {
-      this.api[i] = (data: any) => {
+      this.api[i] = async (data: any) => {
         const url = this.apiList[i].url;
+        // gps坐标转物理地址
         if (i === 'gpsToAddress') {
           data = {
             callback: 'renderReverse',
@@ -57,7 +58,7 @@ export default class Api {
     }
   }
 
-  public service: any = null
+  public service: any = null;
   // 请求列表，在这里添加相应接口
   public apiList: IApiList = {
     login: {
@@ -66,7 +67,7 @@ export default class Api {
       method: 'post',
     },
     logout: {
-      url: '/sys/user/logout',
+      url: '/sys/user/loginOut',
       fetchType: 'json',
       method: 'post',
     },
@@ -109,54 +110,56 @@ export default class Api {
       url: '/public/menus.json',
       fetchType: 'jsonfile',
       method: 'get',
-    }
-  }
+    },
+  };
   // 对外暴露方法
-  public api: IApis = {}
-  public baseUrl: string = ''
+  public api: IApis = {};
+  public baseUrl: string = '';
 
-  public request = (options: IOptions) => this.fetch(options).then((response: any) => {
-    const { statusText, status } = response;
-    let { data } = response;
-    if (data instanceof Array) {
-      data = {
-        list: data,
-      };
-    }
-    // 登录超时判断
-    if (response.data.result && response.data.result.resultCode === 3) {
-      // router.replace({ name: 'login' });
-      return Promise.reject({
-        success: false,
-        message: response.data.result.resultMessage,
+  public request = (options: IOptions) =>
+    this.fetch(options)
+      .then((response: any) => {
+        const { statusText, status } = response;
+        let { data } = response;
+        if (data instanceof Array) {
+          data = {
+            list: data,
+          };
+        }
+        // 登录超时判断
+        if (response.data.result && response.data.result.resultCode === 3) {
+          // router.replace({ name: 'login' });
+          return Promise.reject({
+            success: false,
+            data: response.data,
+            message: response.data.result.resultMessage,
+          });
+        }
+        return Promise.resolve({
+          success: true,
+          message: statusText,
+          statusCode: status,
+          ...data,
+        });
+      })
+      .catch((error: any) => {
+        const { response, data } = error;
+        let msg;
+        let statusCode;
+        if (response && response instanceof Object) {
+          const { data, statusText } = response;
+          statusCode = response.status;
+          msg = data.message || statusText;
+        } else {
+          statusCode = 600;
+          msg = error.message || 'Network Error';
+        }
+        message.error(msg);
+        return Promise.resolve({ success: false, statusCode, ...data, message: msg });
       });
-    }
-    return Promise.resolve({
-      success: true,
-      message: statusText,
-      statusCode: status,
-      ...data,
-    });
-  }).catch((error: any) => {
-    const { response } = error;
-    let msg;
-    let statusCode;
-    if (response && response instanceof Object) {
-      const { data, statusText } = response;
-      statusCode = response.status;
-      msg = data.message || statusText;
-    } else {
-      statusCode = 600;
-      msg = error.message || 'Network Error';
-    }
-    message.error(msg);
-    return Promise.reject({ success: false, statusCode, message: msg });
-  })
 
   public fetch = (options: IOptions) => {
-    const {
-      url, data, fetchType, method = 'get',
-    } = options;
+    const { url, data, fetchType, method = 'get' } = options;
     let cloneData: any = lodash.cloneDeep(data);
     cloneData = qs.stringify(cloneData);
     const headers = {
@@ -166,16 +169,20 @@ export default class Api {
 
     if (fetchType === 'jsonp') {
       return new Promise((resolve, reject) => {
-        jsonp(url, {
-          param: `${qs.stringify(data)}&callback`,
-          name: `jsonp_${new Date().getTime()}`,
-          timeout: 4000,
-        }, (error: Error, result: object) => {
-          if (error) {
-            reject(error);
+        jsonp(
+          url,
+          {
+            param: `${qs.stringify(data)}&callback`,
+            name: `jsonp_${new Date().getTime()}`,
+            timeout: 4000,
+          },
+          (error: Error, result: object) => {
+            if (error) {
+              reject(error);
+            }
+            resolve({ statusText: 'OK', status: 200, data: result });
           }
-          resolve({ statusText: 'OK', status: 200, data: result });
-        });
+        );
       });
     } else if (fetchType === 'json') {
       return this.service({
@@ -194,9 +201,13 @@ export default class Api {
       case 'get':
         return this.service.get(`${url}?${cloneData}`, { headers });
       case 'delete':
-        return this.service.delete(url, {
-          data: cloneData,
-        }, { headers });
+        return this.service.delete(
+          url,
+          {
+            data: cloneData,
+          },
+          { headers }
+        );
       case 'post':
         return this.service.post(url, cloneData, { headers });
       case 'put':
@@ -206,5 +217,5 @@ export default class Api {
       default:
         return this.service(options);
     }
-  }
+  };
 }

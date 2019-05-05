@@ -4,7 +4,7 @@ import createHistory from 'history/createHashHistory'
 export default {
   config() {
     return {
-      onError(err) {
+      onError(err: any) {
         err.preventDefault()
         console.error(err.message)
       },
